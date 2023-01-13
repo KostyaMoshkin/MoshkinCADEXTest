@@ -10,12 +10,16 @@ namespace Curves
 	{
 	}
 
-	Point3D Helix::getPoint(double parametr_)
+	Helix::~Helix()
+	{
+	}
+
+	const Point3D Helix::getPoint(double parametr_) const
 	{
 		return Point3D(cos(parametr_) * m_fRadius, sin(parametr_) * m_fRadius, m_fStep * parametr_ / (2 * PI));
 	}
 
-	Point3D Helix::getDerivative(double parametr_)
+	const Point3D Helix::getDerivative(double parametr_) const
 	{
 		return Point3D(-1.0 * sin(parametr_) * m_fRadius, cos(parametr_) * m_fRadius, m_fStep / (2 * PI));
 	}

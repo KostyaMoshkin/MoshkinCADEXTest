@@ -8,12 +8,16 @@ namespace Curves
 	{
 	}
 
-	Point3D Ellipse::getPoint(double parametr_)
+	Ellipse::~Ellipse()
+	{
+	}
+
+	const Point3D Ellipse::getPoint(double parametr_) const
 	{
 		return Point3D(cos(parametr_) * m_fRadius1, sin(parametr_) * m_fRadius2, 0);
 	}
 
-	Point3D Ellipse::getDerivative(double parametr_)
+	const Point3D Ellipse::getDerivative(double parametr_) const
 	{
 		return Point3D(-1.0 * sin(parametr_) * m_fRadius1, cos(parametr_) * m_fRadius2, 0);
 	}

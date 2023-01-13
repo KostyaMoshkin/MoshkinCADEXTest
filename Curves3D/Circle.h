@@ -10,13 +10,14 @@ namespace Curves
 
     public:
         Circle(double r_);
+        virtual ~Circle();
 
     public:
-        Point3D getPoint(double parametr_) override;
-        Point3D getDerivative(double parametr_) override;
+        const Point3D getPoint(double parametr_) const override;
+        const Point3D getDerivative(double parametr_) const override;
 
     public:
-        double getRadius() { return m_fRadius; }
+        const double getRadius() const { return m_fRadius; }
     };
 }
 

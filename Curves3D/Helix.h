@@ -11,9 +11,10 @@ namespace Curves
 
     public:
         Helix(double r_, double s_);
+        virtual ~Helix();
 
     public:
-        Point3D getPoint(double parametr_) override;
-        Point3D getDerivative(double parametr_) override;
+        const Point3D getPoint(double parametr_) const override;
+        const Point3D getDerivative(double parametr_) const override;
     };
 }

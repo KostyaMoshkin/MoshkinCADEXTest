@@ -67,7 +67,7 @@ int main()
         }
     }
 
-    for (Curves::Curves3D* pCurve : m_vCurve)
+    for (const Curves::Curves3D* pCurve : m_vCurve)
     {
         Curves::Point3D point_PI_4 = pCurve->getPoint(PI_4);
         print("coordinates of points at t=PI/4", point_PI_4);
@@ -76,16 +76,16 @@ int main()
         print("derivative at t=PI/4", derivative_PI_4);
     }
 
-    std::vector<Curves::Circle* > m_vCircle;
+    std::vector<const Curves::Circle* > m_vCircle;
 
-    for (Curves::Curves3D* pCurve : m_vCurve)
+    for (const Curves::Curves3D* pCurve : m_vCurve)
     {
-        Curves::Circle* pCircle = dynamic_cast<Curves::Circle* >(pCurve);
+        const Curves::Circle* pCircle = dynamic_cast<const Curves::Circle* >(pCurve);
         if (!!pCircle)
             m_vCircle.push_back(pCircle);
     }
 
-    std::sort(m_vCircle.begin(), m_vCircle.end(), [](Curves::Circle* a_, Curves::Circle* b_) { return a_->getRadius() < b_->getRadius(); });
+    std::sort(m_vCircle.begin(), m_vCircle.end(), [](const Curves::Circle* a_, const Curves::Circle* b_) { return a_->getRadius() < b_->getRadius(); });
 
     size_t nThreadCount = std::min<size_t>(omp_get_max_threads(), m_vCircle.size());
     size_t nElementsInOririginalThread = m_vCircle.size() / nThreadCount;

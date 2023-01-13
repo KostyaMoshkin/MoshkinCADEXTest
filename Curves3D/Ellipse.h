@@ -11,9 +11,10 @@ namespace Curves
 
     public:
         Ellipse(double r1_, double r2_);
+        virtual ~Ellipse();
 
     public:
-        Point3D getPoint(double parametr_) override;
-        Point3D getDerivative(double parametr_) override;
+        const  Point3D getPoint(double parametr_) const override;
+        const Point3D getDerivative(double parametr_) const override;
     };
 }

@@ -8,12 +8,16 @@ namespace Curves
     {
     }
 
-    Point3D Circle::getPoint(double parametr_)
+    Circle::~Circle()
+    {
+    }
+
+    const Point3D Circle::getPoint(double parametr_) const
     {
         return Point3D(cos(parametr_) * m_fRadius, sin(parametr_) * m_fRadius, 0);
     }
 
-    Point3D Circle::getDerivative(double parametr_)
+    const Point3D Circle::getDerivative(double parametr_) const
     {
         return Point3D(-1.0 * sin(parametr_) * m_fRadius, cos(parametr_) * m_fRadius, 0);
     }

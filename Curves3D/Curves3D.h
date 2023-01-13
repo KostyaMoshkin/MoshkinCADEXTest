@@ -22,7 +22,7 @@ namespace Curves
 		Curves3D(void) = default;
 
 	public:
-		virtual Point3D getPoint(double parametr_) = 0;
-		virtual Point3D getDerivative(double parametr_) = 0;
+		virtual const Point3D getPoint(double parametr_) const = 0;
+		virtual const Point3D getDerivative(double parametr_) const = 0;
 	};
 }
