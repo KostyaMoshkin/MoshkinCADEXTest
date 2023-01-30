@@ -1,19 +1,4 @@
-﻿/*
-Пояснение к решению.
-
-Программа писалась с минимальными затратами времени, поэтому вывод данных и прочее сделано без украшательств,
-отсутствуют проверки на ошибки времени исполнения.
-
-Вывод тех вычисленных значений, вывод которых не требуется, не делается. Значения проверяются в Debug.
-
-В задании указано, что параметр t - берется вдоль кривой, однако не указано из каких соображений кроме 
-helix. Там из приведенного примера ясно, что при изменении t на 2PI координаты x и y повторяются. Для 
-дугих кривых использовал то же правило: t - угол в XOY в полярных координатах.
-
-Радиусы задаю положительными значениями больше 1. Для простоты задаю step > 0.
-*/
-
-#include <iostream>
+﻿#include <iostream>
 
 #include <Circle.h>
 #include <Ellipse.h>
@@ -24,68 +9,72 @@ helix. Там из приведенного примера ясно, что пр
 
 #include <omp.h>
 
-#define CURVES_COUNT 1024
-#define RADIUS_MAX 256 - 1
-#define STEP_MAX 256
-#define PI_4 0.785398
+//-----------------------------------------------------------------------------------------------------------
 
-static size_t getRand_N(size_t nRange_)
+const int nCurvesCount = 1024;
+const int nRadiuMax = 256;
+const int nStepMax = 256;
+const double fPiBy4 = 0.785398;
+
+//-----------------------------------------------------------------------------------------------------------
+
+static inline double getRand(size_t nRange_)
 {
-    return size_t(std::rand() * nRange_ / RAND_MAX);
+    return 1.0 * std::rand() / RAND_MAX * nRange_;
 }
 
-static double getRand_F(size_t nRange_)
+static inline void print(const char* sMessage_, const Curves::Point3D& point_)
 {
-    return 1.0 * std::rand() * nRange_ / RAND_MAX;
+    std::cout << sMessage_ << " : " << point_.x << ", " << point_.y << ", " << point_.z << "." << std::endl;
 }
 
-static void print(const char* sMessage_, const Curves::Point3D& point_)
+static inline const Curves::Circle* toCircle(Curves::Curves3DConstPtr pCurve_)
 {
-    std::cout << sMessage_ << " : ";
-
-    std::cout << point_.x << ", ";
-    std::cout << point_.y << ", ";
-    std::cout << point_.z << ".";
-
-    std::cout << std::endl;
+    return dynamic_cast<const Curves::Circle*>(pCurve_.get());
 }
+
+//-----------------------------------------------------------------------------------------------------------
 
 int main()
 {
     std::srand((unsigned int)std::time(nullptr));
 
-    std::vector<Curves::Curves3D* > m_vCurve;
+    std::vector<Curves::Curves3DConstPtr> m_vCurve;
 
-    for (int i = 0; i < CURVES_COUNT; ++i)
+    for (int i = 0; i < nCurvesCount; ++i)
     {
-        switch (getRand_N(3))
+        switch (size_t(getRand(3)))
         {
-        case 0 : m_vCurve.push_back(new Curves::Circle(getRand_F(RADIUS_MAX) + 1)); break;
-        case 1 : m_vCurve.push_back(new Curves::Ellipse(getRand_F(RADIUS_MAX) + 1, getRand_F(RADIUS_MAX) + 1)); break;
-        case 2 : m_vCurve.push_back(new Curves::Helix(getRand_F(RADIUS_MAX) + 1, getRand_F(STEP_MAX))); break;
+        case 0 : m_vCurve.push_back(Curves::Circle::Create(getRand(nRadiuMax) + 1)); break;
+        case 1 : m_vCurve.push_back(Curves::Ellipse::Create(getRand(nRadiuMax) + 1, getRand(nRadiuMax) + 1)); break;
+        case 2 : m_vCurve.push_back(Curves::Helix::Create(getRand(nRadiuMax) + 1, getRand(nStepMax))); break;
         default: break;
         }
     }
 
-    for (const Curves::Curves3D* pCurve : m_vCurve)
+    //-----------------------------------------------------------------------------------------------------------
+
+    for (Curves::Curves3DConstPtr& pCurve : m_vCurve)
     {
-        Curves::Point3D point_PI_4 = pCurve->getPoint(PI_4);
+        Curves::Point3D point_PI_4 = pCurve->getPoint(fPiBy4);
         print("coordinates of points at t=PI/4", point_PI_4);
 
-        Curves::Point3D derivative_PI_4 = pCurve->getDerivative(PI_4);
+        Curves::Point3D derivative_PI_4 = pCurve->getDerivative(fPiBy4);
         print("derivative at t=PI/4", derivative_PI_4);
     }
 
-    std::vector<const Curves::Circle* > m_vCircle;
+    //-----------------------------------------------------------------------------------------------------------
 
-    for (const Curves::Curves3D* pCurve : m_vCurve)
-    {
-        const Curves::Circle* pCircle = dynamic_cast<const Curves::Circle* >(pCurve);
-        if (!!pCircle)
-            m_vCircle.push_back(pCircle);
-    }
+    std::vector<Curves::Curves3DConstPtr> m_vCircle;
 
-    std::sort(m_vCircle.begin(), m_vCircle.end(), [](const Curves::Circle* a_, const Curves::Circle* b_) { return a_->getRadius() < b_->getRadius(); });
+    for (Curves::Curves3DConstPtr& pCurve : m_vCurve)
+        if (!!toCircle(pCurve))
+            m_vCircle.push_back(pCurve);
+
+    std::sort(m_vCircle.begin(), m_vCircle.end(), 
+        [](auto a_, auto b_) { return toCircle(a_)->getRadius() < toCircle(b_)->getRadius(); });
+
+    //-----------------------------------------------------------------------------------------------------------
 
     size_t nThreadCount = std::min<size_t>(omp_get_max_threads(), m_vCircle.size());
     size_t nElementsInOririginalThread = m_vCircle.size() / nThreadCount;
@@ -102,9 +91,8 @@ int main()
         size_t nElementCount = (nCurrentThread == nThreadCount - 1) ? nElementsInMasterThread : nElementsInOririginalThread;
 
         for (size_t i = 0; i < nElementCount; ++i)
-            fRadiusSum += m_vCircle[nCurrentThread * nElementsInOririginalThread + i]->getRadius();
+            fRadiusSum += toCircle(m_vCircle[nCurrentThread * nElementsInOririginalThread + i])->getRadius();
     }
 
-    for (Curves::Curves3D* pCurve : m_vCurve)
-        delete pCurve;
+    std::cout << "Total sum of radius: " << fRadiusSum << std::endl;
 }
