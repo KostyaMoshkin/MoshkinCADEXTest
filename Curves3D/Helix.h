@@ -15,7 +15,6 @@ namespace Curves
 
     public:
         Helix(double r_, double s_);
-        virtual ~Helix();
 
         static HelixConstPtr Create(double r1_, double s_) { return std::make_shared<const Helix>(r1_, s_); }
 

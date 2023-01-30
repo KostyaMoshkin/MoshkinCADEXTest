@@ -13,7 +13,6 @@ namespace Curves
 
     public:
         Circle(double r_);
-        virtual ~Circle();
 
     public:
         const Point3D getPoint(double parametr_) const override;

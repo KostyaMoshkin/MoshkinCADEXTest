@@ -8,10 +8,6 @@ namespace Curves
 	{
 	}
 
-	Ellipse::~Ellipse()
-	{
-	}
-
 	const Point3D Ellipse::getPoint(double parametr_) const
 	{
 		return Point3D(cos(parametr_) * m_fRadius1, sin(parametr_) * m_fRadius2, 0);
